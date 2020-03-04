@@ -1,6 +1,7 @@
 # Import modules
 import arcade
 import os
+import pyglet.media as pm
 
 # My imports
 import constants
@@ -30,6 +31,12 @@ class MenuView(arcade.View):
         ]
 
         self.menu_item_selected = 0
+
+        # Background music
+        self.music = pm.load(utils.resource_path(os.path.join('data', 'music0.wav')))
+        self.player = pm.Player()
+        self.player.queue(self.music)
+        self.player.play()
 
     """
     Menu View Class
@@ -76,10 +83,12 @@ class MenuView(arcade.View):
 
         if key == arcade.key.ENTER:
             if self.menu[self.menu_item_selected] == "1 Player":
+                self.player.delete()                                # Stop background music
                 game_view = gameview.GameView(1)                    # Start single player game vs AI
                 self.window.show_view(game_view)
 
             if self.menu[self.menu_item_selected] == "2 Players":
+                self.player.delete()                                # Stop background music
                 game_view = gameview.GameView(0)                    # Start two player game on same keyboard
                 self.window.show_view(game_view)
 

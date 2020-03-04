@@ -1,6 +1,7 @@
 # Import modules
 from random import randint
 import os
+import pyglet.media as pm
 
 # My imports
 import constants
@@ -43,6 +44,12 @@ class GameView(arcade.View):
         ]
         self.background = None
 
+        # Background music
+        self.music = pm.load(utils.resource_path(os.path.join('data', 'music1.wav')))
+        self.player = pm.Player()
+        self.player.queue(self.music)
+        self.player.play()
+
         # Powerups
         # Init power ups list
         self.powerups = arcade.SpriteList()
@@ -60,7 +67,11 @@ class GameView(arcade.View):
         # Player 2
         # Game mode affects player2 creation - AI or not
         # Parameters: ship, x, y, r, max_speed, rotation_speed, acceleration, isAI
-        self.player2 = player.ClassPlayer("Player 2", "viper",
+        if self.game_mode == 1:
+            name2nd = "alien"
+        else:
+            name2nd = "viper"
+        self.player2 = player.ClassPlayer("Player 2", name2nd,
                                           constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2, -90,
                                           constants.MAX_SPEED, constants.MAX_ROTATION_SPEED, constants.ACCELERATION,
                                           self.game_mode)
@@ -123,6 +134,9 @@ class GameView(arcade.View):
         # Update power-ups
         self.powerups.update()
 
+        if self.player1.health <= 0 or self.player2.health <= 0:
+            self.player.delete()
+
     """
     Game View Class
     On_Key_Press - All key handling is here
@@ -149,7 +163,7 @@ class GameView(arcade.View):
         elif key == arcade.key.RIGHT:
             self.player1.rotate_cw()
         elif key == arcade.key.INSERT:
-            self.player1.spawn_bullet()
+            self.player1.shoot()
         """
         Player 2 controls
         The difference is check for game mode. In case of single player game do nothing here
@@ -164,7 +178,7 @@ class GameView(arcade.View):
             elif key == arcade.key.D:
                 self.player2.rotate_cw()
             elif key == arcade.key.TAB:
-                self.player2.spawn_bullet()
+                self.player2.shoot()
 
     """
     Game View Class

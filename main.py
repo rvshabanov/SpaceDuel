@@ -30,6 +30,7 @@ def main():
     window.set_update_rate(1 / 60)
     if constants.SCREEN_FULLSCREEN:
         window.set_fullscreen(True)
+        constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT = window.get_size()
 
     menu_view = menus.MenuView()
     window.show_view(menu_view)

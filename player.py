@@ -135,8 +135,12 @@ class ClassPlayer:
         self.isAI = isai
 
         # Init emitter used to draw explosions
-        self.emitter = None
         self.burst_texture = utils.resource_path(os.path.join('data/' + ship, 'burst.png'))
+        self.emitters = []
+
+        self.sound_laser = arcade.load_sound(utils.resource_path(os.path.join('data/' + ship, 'laser0.wav')))
+        self.sound_mine = arcade.load_sound(utils.resource_path(os.path.join('data/' + ship, 'mine0.wav')))
+        self.sound_boom = arcade.load_sound(utils.resource_path(os.path.join('data/' + ship, 'boom0.wav')))
 
         # Mines
         self.mines = arcade.SpriteList()
@@ -161,8 +165,8 @@ class ClassPlayer:
         self.bullets.draw()                             # Draw bullets
 
         # Burst Emitter
-        if self.emitter:
-            self.emitter.draw()
+        for e in self.emitters:
+            e.draw()
 
     """
     Player Class
@@ -203,13 +207,17 @@ class ClassPlayer:
         mine.change_angle = 5
 
         self.mines.append(mine)
+        arcade.play_sound(self.sound_mine)
+
     """
     Player Class
     Boom  -   no parameters
     Start emitter to display explosion
     """
     def boom(self):
-        self.emitter = self.emitter_0()
+        e = self.emitter_0()
+        self.emitters.append(e)
+        arcade.play_sound(self.sound_boom)
 
     """
     Player Class
@@ -241,8 +249,8 @@ class ClassPlayer:
         self.bullets.update()                       # Update bullets
 
         # Burst Emitter
-        if self.emitter:
-            self.emitter.update()
+        for e in self.emitters:
+            e.update()
 
         # Cool down laser
         self.cooldown += 1
@@ -270,7 +278,7 @@ class ClassPlayer:
 
             # Shoot lasers randomly
             if not randint(0, constants.AI_SHOOT_PACE):
-                self.spawn_bullet()
+                self.shoot()
 
             # Drop mine randomly
             if not randint(0, constants.AI_SHOOT_PACE):
@@ -381,7 +389,7 @@ class ClassPlayer:
     Spawn Bullet  -   parameters:
                             angle - initial angle of the bullet
     """
-    def spawn_bullet(self):
+    def shoot(self):
         if self.cooldown < self.bullet_cooldown:
             return
 
@@ -395,6 +403,7 @@ class ClassPlayer:
         bullet.change_y = np.sin(np.deg2rad(self.sprite.angle + 90)) * constants.BULLET_SPEED
 
         self.bullets.append(bullet)
+        arcade.play_sound(self.sound_laser)
 
     """
     Player Class

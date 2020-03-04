@@ -5,15 +5,13 @@ Adjust to change game play
 TO DO LIST:
 Gameplay:
 TODO: 1. LAN Game
-TODO: 2. Music and Sounds?
-TODO: 3. Multiple explosions (list with emitters)?
-TODO: AI - Predictive shooting? (HARD)
+TODO: 2. AI - Predictive shooting? (Difficulty = HARD?)
 """
 
 # Window size etc.
 SCREEN_WIDTH = 1600                     # Window width in pixels
 SCREEN_HEIGHT = 800                     # Window height in pixels
-SCREEN_FULLSCREEN = 0                   # Do you want it full screen? Go for it!
+SCREEN_FULLSCREEN = 1                   # Do you want it full screen? Go for it!
 SCREEN_TITLE = "Space Duel v0.0000001"  # Window caption
 
 # Spacecraft related
@@ -36,6 +34,7 @@ MAX_POWERUPS = 1                        # No of power-ups in the field
 
 # AI related for single player game
 AI_SHOOT_PACE = 50                      # AI shoot pace, less number - faster
+AI_PREDICTIVE = 1                       # AI predictive aiming - calc where Player will be in future and shoot there
 
 # Burst related
 BURST_PARTICLE_COUNT = 500              # No of particles in an explosion
