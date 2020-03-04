@@ -26,6 +26,7 @@ BULLET_SPEED = 20                       # Default laser/bullet speed
 BULLET_COOLDOWN = 50                    # Laser cool down cycles. Decrease for rapid fire or collect powerups
 HIT_DAMAGE = 10                         # Damage done when laser hits enemy
 MAX_MINES = 5                           # Max mines allowed per player
+MINE_COOLDOWN = 100                     # Mine cool down cycles
 MINE_DAMAGE = 50                        # Damage done by 1 mine to the enemy
 
 # Power-ups related

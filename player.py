@@ -151,6 +151,8 @@ class ClassPlayer:
         self.cooldown = 0                                       # Cooldown counter
         self.bullet_cooldown = constants.BULLET_COOLDOWN        # Current cooldown setting (adjusted by powerups)
 
+        self.m_cooldown = constants.MINE_COOLDOWN               # Mine cooldown
+
         # Player to Player collision on flag
         self.collision_on = True
 
@@ -191,6 +193,27 @@ class ClassPlayer:
 
     """
     Player Class
+    Spawn Bullet  -   parameters:
+                            angle - initial angle of the bullet
+    """
+    def shoot(self):
+        if self.cooldown < self.bullet_cooldown:
+            return
+
+        self.cooldown = 0
+        bullet = arcade.Sprite(utils.resource_path(os.path.join('data/' + self.ship, 'laser0.png')), 0.2)
+        bullet.angle = self.sprite.angle
+        bullet.center_x = self.sprite.center_x
+        bullet.center_y = self.sprite.center_y
+
+        bullet.change_x = np.cos(np.deg2rad(self.sprite.angle + 90)) * constants.BULLET_SPEED
+        bullet.change_y = np.sin(np.deg2rad(self.sprite.angle + 90)) * constants.BULLET_SPEED
+
+        self.bullets.append(bullet)
+        arcade.play_sound(self.sound_laser)
+
+    """
+    Player Class
     Mine  -   no parameters
     Drop the mine
     """
@@ -198,6 +221,10 @@ class ClassPlayer:
         if len(self.mines) + 1 > constants.MAX_MINES:
             return
 
+        if self.m_cooldown < constants.MINE_COOLDOWN:
+            return
+
+        self.m_cooldown = 0
         mine = arcade.Sprite(utils.resource_path(os.path.join('data/' + self.ship, 'mine.png')), 0.3)
         mine.center_x = self.sprite.center_x
         mine.center_y = self.sprite.center_y
@@ -257,6 +284,9 @@ class ClassPlayer:
 
         # Cool down laser
         self.cooldown += 1
+
+        # Cool down mine
+        self.m_cooldown += 1
 
         # Calculate distance between players used below
         dx = self.sprite.center_x - other_player.sprite.center_x  # x difference
@@ -386,27 +416,6 @@ class ClassPlayer:
             if bullet.top < 0 or bullet.bottom > constants.SCREEN_HEIGHT or \
                bullet.right < 0 or bullet.left > constants.SCREEN_WIDTH:
                 bullet.remove_from_sprite_lists()
-
-    """
-    Player Class
-    Spawn Bullet  -   parameters:
-                            angle - initial angle of the bullet
-    """
-    def shoot(self):
-        if self.cooldown < self.bullet_cooldown:
-            return
-
-        self.cooldown = 0
-        bullet = arcade.Sprite(utils.resource_path(os.path.join('data/' + self.ship, 'laser0.png')), 0.2)
-        bullet.angle = self.sprite.angle
-        bullet.center_x = self.sprite.center_x
-        bullet.center_y = self.sprite.center_y
-
-        bullet.change_x = np.cos(np.deg2rad(self.sprite.angle + 90)) * constants.BULLET_SPEED
-        bullet.change_y = np.sin(np.deg2rad(self.sprite.angle + 90)) * constants.BULLET_SPEED
-
-        self.bullets.append(bullet)
-        arcade.play_sound(self.sound_laser)
 
     """
     Player Class
