@@ -42,3 +42,4 @@ DEFAULT_PARTICLE_LIFETIME = 1.0         # Particle lifetime
 PARTICLE_SPEED_FAST = 1.0               # Particle speed
 DEFAULT_SCALE = 0.2                     # Scale of bitmap, 20%
 DEFAULT_ALPHA = 32                      # Alpha
+MAX_EMITTERS = 3                        # Maximum number of burst emitters on the list per player

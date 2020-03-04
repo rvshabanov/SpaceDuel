@@ -99,6 +99,17 @@ class MenuView(arcade.View):
             if self.menu[self.menu_item_selected] == "Exit":
                 arcade.close_window()                               # Sayonara!
 
+    """
+    Menu View Class
+    On Update  -   no parameters
+    Handles updates while in the main menu
+    """
+    def on_update(self, delta_time):
+        # Restart music if it is over
+        if not self.player.playing:
+            self.player.queue(self.music)
+            self.player.play()
+
 
 """
 Controls View Class

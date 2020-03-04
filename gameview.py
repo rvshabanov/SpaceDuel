@@ -134,6 +134,12 @@ class GameView(arcade.View):
         # Update power-ups
         self.powerups.update()
 
+        # Restart music if it is over
+        if not self.player.playing:
+            self.player.queue(self.music)
+            self.player.play()
+
+        # Kill music if game over
         if self.player1.health <= 0 or self.player2.health <= 0:
             self.player.delete()
 

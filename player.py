@@ -217,6 +217,9 @@ class ClassPlayer:
     def boom(self):
         e = self.emitter_0()
         self.emitters.append(e)
+        if len(self.emitters) > constants.MAX_EMITTERS:
+            self.emitters.pop(0)
+
         arcade.play_sound(self.sound_boom)
 
     """
