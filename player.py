@@ -190,7 +190,8 @@ class ClassPlayer:
     Accelerate  -   no parameters
     """
     def accelerate(self):
-        if self.sprite.thrust_on == 0: self.sprite.thrust_on = 1
+        if self.sprite.thrust_on == 0:
+            self.sprite.thrust_on = 1
 
     """
     Player Class
@@ -298,11 +299,22 @@ class ClassPlayer:
         # Is it single player mode with AI enemy?
         if self.isAI:
             if dy != 0:
-                a = np.rad2deg(np.arctan(dx/dy))                                  # Calc angle to aim in degrees
+                if constants.AI_PREDICTIVE == 0:
+                    a = np.rad2deg(np.arctan(dx/dy))                              # Calc angle to aim in degrees
+                else:
+                    # Predictive calc angle to aim taking into account player velocity
+                    t = d / constants.BULLET_SPEED                                # Approx. time bullet will travel
+
+                    # Difference taking into account opponent speed vectors
+                    dx1 = self.sprite.center_x - (other_player.sprite.center_x + other_player.sprite.change_x * t)
+                    dy1 = self.sprite.center_y - (other_player.sprite.center_y + other_player.sprite.change_y * t)
+
+                    a = np.rad2deg(np.arctan(dx1/dy1))                            # Calc predicted angle to aim
+
                 if dy < 0:
                     self.sprite.angle = -a                                        # Set AI player's sprite angle
                 else:
-                    self.sprite.angle = -a - 180                                  # Set AI player's sprite angle
+                    self.sprite.angle = -a + 180                                  # Set AI player's sprite angle
 
             # Accelerate if distance > 300 for close combat action
             if d > 300:

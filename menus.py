@@ -84,8 +84,8 @@ class MenuView(arcade.View):
         if key == arcade.key.ENTER:
             if self.menu[self.menu_item_selected] == "1 Player":
                 self.player.delete()                                # Stop background music
-                game_view = gameview.GameView(1)                    # Start single player game vs AI
-                self.window.show_view(game_view)
+                difficulty_view = DifficultyView()                    # Show Difficulty selection screen
+                self.window.show_view(difficulty_view)
 
             if self.menu[self.menu_item_selected] == "2 Players":
                 self.player.delete()                                # Stop background music
@@ -109,6 +109,103 @@ class MenuView(arcade.View):
         if not self.player.playing:
             self.player.queue(self.music)
             self.player.play()
+
+
+"""
+Difficulty View Class
+Difficulty menu view
+"""
+
+
+class DifficultyView(arcade.View):
+    """
+    Difficulty View Class
+    Init method -   no parameters
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.menu = [
+            "Easy",
+            "Medium",
+            "Hard",
+            "Nightmare",
+        ]
+
+        self.menu_item_selected = 1
+
+    """
+    Difficulty View Class
+    On Show method -   no parameters
+    """
+    def on_show(self):
+        arcade.set_background_color(arcade.color.ORANGE)
+
+    """
+    Difficulty View Class
+    On Draw method -   no parameters
+    Draw background and menu items
+    """
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_lrwh_rectangle_textured(0, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT,
+                                            arcade.load_texture(utils.resource_path(os.path.join('data/bg',
+                                                                                                 'bg_menu.jpg'))))
+
+        v_offset = (len(self.menu) - 1) * 50
+        for i in range(0, len(self.menu)):
+            color = arcade.color.WHITE
+            if i == self.menu_item_selected:
+                color = arcade.color.YELLOW
+            arcade.draw_text(self.menu[i], constants.SCREEN_WIDTH / 2,
+                             (constants.SCREEN_HEIGHT + v_offset) / 2 - i * 60,
+                             color, font_size=50, anchor_x="center")
+
+    """
+    Difficulty View Class
+    On Key Press -   parameters:
+                        key             - key code
+                        _modifiers      - modifiers, i.e. shift, ctrl, etc.
+                        see arcade docs for details
+    Handles key presses in the main menu
+    """
+    def on_key_press(self, key, _modifiers):
+
+        if key == arcade.key.DOWN and self.menu_item_selected < len(self.menu) - 1:
+            self.menu_item_selected += 1
+
+        if key == arcade.key.UP and self.menu_item_selected > 0:
+            self.menu_item_selected -= 1
+
+        if key == arcade.key.ENTER:
+            if self.menu[self.menu_item_selected] == "Easy":
+                constants.AI_SHOOT_PACE = constants.AI_EASY_SHOOT_PACE
+                constants.AI_PREDICTIVE = 0
+                game_view = gameview.GameView(1)                    # Start single player game vs AI
+                self.window.show_view(game_view)
+            if self.menu[self.menu_item_selected] == "Medium":
+                constants.AI_SHOOT_PACE = constants.AI_MEDIUM_SHOOT_PACE
+                constants.AI_PREDICTIVE = 0
+                game_view = gameview.GameView(1)                    # Start single player game vs AI
+                self.window.show_view(game_view)
+            if self.menu[self.menu_item_selected] == "Hard":
+                constants.AI_SHOOT_PACE = constants.AI_HARD_SHOOT_PACE
+                constants.AI_PREDICTIVE = 0
+                game_view = gameview.GameView(1)                    # Start single player game vs AI
+                self.window.show_view(game_view)
+            if self.menu[self.menu_item_selected] == "Nightmare":
+                constants.AI_SHOOT_PACE = constants.AI_NIGHTMARE_SHOOT_PACE
+                constants.AI_PREDICTIVE = 1
+                game_view = gameview.GameView(1)                    # Start single player game vs AI
+                self.window.show_view(game_view)
+
+    """
+    Difficulty View Class
+    On Update  -   no parameters
+    Handles updates while in the main menu
+    """
+    def on_update(self, delta_time):
+        pass
 
 
 """

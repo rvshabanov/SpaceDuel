@@ -13,6 +13,7 @@ SCREEN_WIDTH = 1600                     # Window width in pixels
 SCREEN_HEIGHT = 800                     # Window height in pixels
 SCREEN_FULLSCREEN = 1                   # Do you want it full screen? Go for it!
 SCREEN_TITLE = "Space Duel v0.0000001"  # Window caption
+SPRITE_SIZE = 64
 
 # Spacecraft related
 MAX_SPEED = 10.0                        # Maximum speed allowed
@@ -34,8 +35,12 @@ POWERUP_EFFECT = 10                     # Power up effect on laser cool down
 MAX_POWERUPS = 1                        # No of power-ups in the field
 
 # AI related for single player game
+AI_EASY_SHOOT_PACE = 150                # AI shoot pace - Difficult EASY
+AI_MEDIUM_SHOOT_PACE = 50               # AI shoot pace - Difficult MEDIUM
+AI_HARD_SHOOT_PACE = 10                 # AI shoot pace - Difficult HARD
+AI_NIGHTMARE_SHOOT_PACE = 1             # AI shoot pace - Difficult NIGHTMARE
 AI_SHOOT_PACE = 50                      # AI shoot pace, less number - faster
-AI_PREDICTIVE = 1                       # AI predictive aiming - calc where Player will be in future and shoot there
+AI_PREDICTIVE = 0                       # AI predictive aiming - calc where opponent will be in future and shoot there
 
 # Burst related
 BURST_PARTICLE_COUNT = 200              # No of particles in an explosion

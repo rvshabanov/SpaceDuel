@@ -58,7 +58,8 @@ class GameView(arcade.View):
         # Player 1
         # Parameters: ship, x, y, r, max_speed, rotation_speed, acceleration, isAI
         self.player1 = player.ClassPlayer("Player 1", "cobra",
-                                          constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT / 2, 90,  # x, y, r
+                                          constants.SCREEN_WIDTH - constants.SPRITE_SIZE,
+                                          constants.SCREEN_HEIGHT / 2 - constants.SPRITE_SIZE * 2, 90,
                                           constants.MAX_SPEED, constants.MAX_ROTATION_SPEED, constants.ACCELERATION,
                                           0)
         self.player1.sprite.speed[0] = -0.01              # Initial motion speed
@@ -72,7 +73,8 @@ class GameView(arcade.View):
         else:
             name2nd = "viper"
         self.player2 = player.ClassPlayer("Player 2", name2nd,
-                                          constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2, -90,
+                                          0 + constants.SPRITE_SIZE,
+                                          constants.SCREEN_HEIGHT / 2 + constants.SPRITE_SIZE * 2, -90,
                                           constants.MAX_SPEED, constants.MAX_ROTATION_SPEED, constants.ACCELERATION,
                                           self.game_mode)
         self.player2.sprite.speed[0] = 0.01               # Initial motion speed
@@ -115,12 +117,12 @@ class GameView(arcade.View):
         self.powerups.draw()
 
         # Draw health bars
-        # Player 1
-        draw_health_bar(10, self.player1.health + 10,
-                        constants.SCREEN_HEIGHT - 10, constants.SCREEN_HEIGHT - 30, self.player1.health)
         # Player 2
-        draw_health_bar(constants.SCREEN_WIDTH - self.player2.health - 10, constants.SCREEN_WIDTH - 10,
+        draw_health_bar(10, self.player2.health + 10,
                         constants.SCREEN_HEIGHT - 10, constants.SCREEN_HEIGHT - 30, self.player2.health)
+        # Player 1
+        draw_health_bar(constants.SCREEN_WIDTH - self.player1.health - 10, constants.SCREEN_WIDTH - 10,
+                        constants.SCREEN_HEIGHT - 10, constants.SCREEN_HEIGHT - 30, self.player1.health)
 
     """
     Game View Class
