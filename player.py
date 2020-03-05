@@ -335,7 +335,7 @@ class ClassPlayer:
         # PLAYER TO PLAYER COLLISION
         # Player 1 vs Player 2 collision
         # See above dx, dy, and d used in below calculations
-        # Collision logic is explained in Collisions.ipynb and Collisions.xlsx
+        # Collision logic is explained in Collisions.ipynb and Collisions.xlsx under data folder
 
         # Check if we are not overlapping P1 and P2 and turn on collision for players
         if d > self.sprite.width / 2 + other_player.sprite.width / 2 and \
