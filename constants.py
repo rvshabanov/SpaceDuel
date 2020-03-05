@@ -38,9 +38,9 @@ AI_SHOOT_PACE = 50                      # AI shoot pace, less number - faster
 AI_PREDICTIVE = 1                       # AI predictive aiming - calc where Player will be in future and shoot there
 
 # Burst related
-BURST_PARTICLE_COUNT = 500              # No of particles in an explosion
+BURST_PARTICLE_COUNT = 200              # No of particles in an explosion
 DEFAULT_PARTICLE_LIFETIME = 1.0         # Particle lifetime
 PARTICLE_SPEED_FAST = 1.0               # Particle speed
 DEFAULT_SCALE = 0.2                     # Scale of bitmap, 20%
 DEFAULT_ALPHA = 32                      # Alpha
-MAX_EMITTERS = 3                        # Maximum number of burst emitters on the list per player
+MAX_EMITTERS = 2                        # Maximum number of burst emitters on the list per player

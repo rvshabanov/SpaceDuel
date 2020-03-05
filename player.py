@@ -65,7 +65,8 @@ class PlayerSprite(arcade.Sprite):
         if self.thrust_on and self.speed[0] < self.max_speed and self.speed[1] < self.max_speed:
             self.speed = self.speed + self.thrust
 
-        # Figure out if we should face left or right
+        # Cycle through images
+        # and handle thrust animation
         self.texture = self.textures[self.thrust_on]
         if self.thrust_on > 0:
             self.thrust_on += 1
@@ -189,7 +190,7 @@ class ClassPlayer:
     Accelerate  -   no parameters
     """
     def accelerate(self):
-        self.sprite.thrust_on = 1
+        if self.sprite.thrust_on == 0: self.sprite.thrust_on = 1
 
     """
     Player Class
@@ -319,10 +320,10 @@ class ClassPlayer:
 
         # END AI actions
 
-        # PLAYER TO PLAYER COLLISION CHECK
+        # PLAYER TO PLAYER COLLISION
         # Player 1 vs Player 2 collision
         # See above dx, dy, and d used in below calculations
-        # The d line defines N-T coord system
+        # Collision logic is explained in Collisions.ipynb and Collisions.xlsx
 
         # Check if we are not overlapping P1 and P2 and turn on collision for players
         if d > self.sprite.width / 2 + other_player.sprite.width / 2 and \
@@ -335,39 +336,16 @@ class ClassPlayer:
             # Turn off collisions to avoid multiple collision events at the same time
             self.collision_on = False
 
-            vx1 = self.sprite.speed[0]                                     # X component of velocity for Player 1
-            vy1 = self.sprite.speed[1]                                     # Y component of velocity for Player 1
+            vn1 = self.sprite.speed[0] * dx / d + self.sprite.speed[1] * dy / d
+            vt1 = -self.sprite.speed[0] * dy / d + self.sprite.speed[1] * dx / d
+            vn2 = other_player.sprite.speed[0] * dx / d + other_player.sprite.speed[1] * dy / d
+            vt2 = -other_player.sprite.speed[0] * dy / d + other_player.sprite.speed[1] * dx / d
 
-            vx2 = other_player.sprite.speed[0]                             # X component of velocity for Player 2
-            vy2 = other_player.sprite.speed[1]                             # Y component of velocity for Player 2
-
-            cos_fi = dx / d                                                # Cos Fi for coord system rotation
-            sin_fi = dy / d                                                # Sin Fi for coord system rotation
-
-            vn1 = vx1 * cos_fi + vy1 * sin_fi                              # Rotate coord system from XY to NT and
-            vt1 = - vx1 * sin_fi + vy1 * cos_fi                            # calc Vn and Vt component of P1 veloc.
-
-            vn2 = vx2 * cos_fi + vy2 * sin_fi                              # Rotate coord system from XY to NT and
-            vt2 = - vx2 * sin_fi + vy2 * cos_fi                            # calc Vn and Vt component of P2 veloc.
-
-            # During collision 2 objects exchange their Vn components of velocity
-            # Thus, Vn1 goes to P1 and
-            # Vn2 goes to P2
-            dx1 = vn2 * cos_fi - vt1 * sin_fi                              # Rotate coord system back to window
-            dy1 = vn2 * sin_fi + vt1 * cos_fi                              # system for P1 and calc DX and DY
-
-            dx2 = vn1 * cos_fi - vt2 * sin_fi                              # Rotate coord system back to window
-            dy2 = vn1 * sin_fi + vt2 * cos_fi                              # system for P2 and calc DX and DY
-
-            self.sprite.speed[0] = dx1                                     # Load X and Y components of speed back
-            self.sprite.speed[1] = dy1                                     # to player 1 sprite
-
-            other_player.sprite.speed[0] = dx2                             # Load X and Y components of speed back
-            other_player.sprite.speed[1] = dy2                             # to player 2 sprite
-
+            self.sprite.speed[0] = vn2 * dx / d - vt1 * dy / d
+            self.sprite.speed[1] = vn2 * dy / d + vt1 * dx / d
+            other_player.sprite.speed[0] = vn1 * dx / d - vt2 * dy / d
+            other_player.sprite.speed[1] = vn1 * dy / d + vt2 * dx / d
         # END COLLISION CHECKS
-        # Extra variables used to give more clarity. Hope this helps...
-        # See details in collision.xlsx Excel sheet
 
         # Check if player hits mine
         ship_hits = arcade.check_for_collision_with_list(self.sprite, other_player.mines)
