@@ -4,14 +4,16 @@ Adjust to change game play
 
 TO DO LIST:
 Gameplay:
-TODO: 1. LAN Game
-TODO: 2. AI - Predictive shooting? (Difficulty = HARD?)
+TODO: 1. LAN Game (in player get data from socket for P2)
+TODO: 2. MP3 music
 """
+
+GAME_MODES = ('2 players', '1 player vs AI', '2 players LAN')
 
 # Window size etc.
 SCREEN_WIDTH = 1600                     # Window width in pixels
 SCREEN_HEIGHT = 800                     # Window height in pixels
-SCREEN_FULLSCREEN = 1                   # Do you want it full screen? Go for it!
+SCREEN_FULLSCREEN = 0                   # Do you want it full screen? Go for it!
 SCREEN_TITLE = "Space Duel v0.0000001"  # Window caption
 SPRITE_SIZE = 64
 

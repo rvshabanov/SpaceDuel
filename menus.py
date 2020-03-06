@@ -26,6 +26,7 @@ class MenuView(arcade.View):
         self.menu = [
             "1 Player",
             "2 Players",
+            "2 Players LAN",
             "Controls",
             "Exit",
         ]
@@ -33,7 +34,7 @@ class MenuView(arcade.View):
         self.menu_item_selected = 0
 
         # Background music
-        self.music = pm.load(utils.resource_path(os.path.join('data', 'music0.wav')))
+        self.music = pm.load(utils.resource_path(os.path.join('data', 'music0.mp3')))
         self.player = pm.Player()
         self.player.queue(self.music)
         self.player.play()
@@ -84,13 +85,18 @@ class MenuView(arcade.View):
         if key == arcade.key.ENTER:
             if self.menu[self.menu_item_selected] == "1 Player":
                 self.player.delete()                                # Stop background music
-                difficulty_view = DifficultyView()                    # Show Difficulty selection screen
+                difficulty_view = DifficultyView()                  # Show Difficulty selection screen
                 self.window.show_view(difficulty_view)
 
             if self.menu[self.menu_item_selected] == "2 Players":
                 self.player.delete()                                # Stop background music
                 game_view = gameview.GameView(0)                    # Start two player game on same keyboard
                 self.window.show_view(game_view)
+
+            if self.menu[self.menu_item_selected] == "2 Players LAN":
+                self.player.delete()                                # Stop background music
+                langame_view = LanGameView()                        # Show LAN Game selection screen
+                self.window.show_view(langame_view)
 
             if self.menu[self.menu_item_selected] == "Controls":
                 controls_view = ControlsView()                      # Show Controls screen
@@ -130,6 +136,7 @@ class DifficultyView(arcade.View):
             "Medium",
             "Hard",
             "Nightmare",
+            "<< back",
         ]
 
         self.menu_item_selected = 1
@@ -161,6 +168,9 @@ class DifficultyView(arcade.View):
                              (constants.SCREEN_HEIGHT + v_offset) / 2 - i * 60,
                              color, font_size=50, anchor_x="center")
 
+        arcade.draw_text("Press ESC for main menu", constants.SCREEN_WIDTH / 2, 0,
+                         arcade.color.WHITE, font_size=20, anchor_x="center")
+
     """
     Difficulty View Class
     On Key Press -   parameters:
@@ -176,6 +186,10 @@ class DifficultyView(arcade.View):
 
         if key == arcade.key.UP and self.menu_item_selected > 0:
             self.menu_item_selected -= 1
+
+        if key == arcade.key.ESCAPE:
+            mainmenu_view = MenuView()  # Show Controls screen
+            self.window.show_view(mainmenu_view)
 
         if key == arcade.key.ENTER:
             if self.menu[self.menu_item_selected] == "Easy":
@@ -198,14 +212,151 @@ class DifficultyView(arcade.View):
                 constants.AI_PREDICTIVE = 1
                 game_view = gameview.GameView(1)                    # Start single player game vs AI
                 self.window.show_view(game_view)
+            if self.menu[self.menu_item_selected] == "<< back":
+                mainmenu_view = MenuView()
+                self.window.show_view(mainmenu_view)
+
+
+"""
+LAN Game View Class
+LAN Game menu view
+"""
+
+
+class LanGameView(arcade.View):
+    """
+    LAN Game View Class
+    Init method -   no parameters
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.menu = [
+            "Start LAN Server",
+            "Connect to LAN Server",
+            "<< back",
+        ]
+
+        self.menu_item_selected = 0
 
     """
-    Difficulty View Class
-    On Update  -   no parameters
-    Handles updates while in the main menu
+    LAN Game View Class
+    On Show method -   no parameters
     """
-    def on_update(self, delta_time):
-        pass
+    def on_show(self):
+        arcade.set_background_color(arcade.color.ORANGE)
+
+    """
+    LAN Game View Class
+    On Draw method -   no parameters
+    Draw background and menu items
+    """
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_lrwh_rectangle_textured(0, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT,
+                                            arcade.load_texture(utils.resource_path(os.path.join('data/bg',
+                                                                                                 'bg_menu.jpg'))))
+
+        v_offset = (len(self.menu) - 1) * 50
+        for i in range(0, len(self.menu)):
+            color = arcade.color.WHITE
+            if i == self.menu_item_selected:
+                color = arcade.color.YELLOW
+            arcade.draw_text(self.menu[i], constants.SCREEN_WIDTH / 2,
+                             (constants.SCREEN_HEIGHT + v_offset) / 2 - i * 60,
+                             color, font_size=50, anchor_x="center")
+
+        arcade.draw_text("Press ESC for main menu", constants.SCREEN_WIDTH / 2, 0,
+                         arcade.color.WHITE, font_size=20, anchor_x="center")
+
+    """
+    LAN Game View Class
+    On Key Press -   parameters:
+                        key             - key code
+                        _modifiers      - modifiers, i.e. shift, ctrl, etc.
+                        see arcade docs for details
+    Handles key presses in the main menu
+    """
+    def on_key_press(self, key, _modifiers):
+
+        if key == arcade.key.DOWN and self.menu_item_selected < len(self.menu) - 1:
+            self.menu_item_selected += 1
+
+        if key == arcade.key.UP and self.menu_item_selected > 0:
+            self.menu_item_selected -= 1
+
+        if key == arcade.key.ESCAPE:
+            mainmenu_view = MenuView()  # Show Controls screen
+            self.window.show_view(mainmenu_view)
+
+        if key == arcade.key.ENTER:
+            if self.menu[self.menu_item_selected] == "Start LAN Server":
+                server_view = ServerStartedView()
+                self.window.show_view(server_view)
+            if self.menu[self.menu_item_selected] == "Connect to LAN Server":
+                client_view = ClientStartedView()
+                self.window.show_view(client_view)
+            if self.menu[self.menu_item_selected] == "<< back":
+                mainmenu_view = MenuView()
+                self.window.show_view(mainmenu_view)
+
+
+class ServerStartedView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.counter = 0
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.ORANGE)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Server started", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 150,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Waiting for connection...", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 100,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text(str(int(self.counter)), constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 50,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+
+        arcade.draw_text("Press ESC to go cancel", constants.SCREEN_WIDTH / 2, 0,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            langame_view = LanGameView()  # Show LAN Game selection screen
+            self.window.show_view(langame_view)
+
+    def on_update(self, delta_time: float):
+        self.counter += delta_time
+
+
+class ClientStartedView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.counter = 0
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.ORANGE)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Client started", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 150,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Scanning LAN for server...", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 100,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text(str(int(self.counter)), constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 50,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+
+        arcade.draw_text("Press ESC to cancel", constants.SCREEN_WIDTH / 2, 0,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            langame_view = LanGameView()  # Show LAN Game selection screen
+            self.window.show_view(langame_view)
+
+    def on_update(self, delta_time: float):
+        self.counter += delta_time
 
 
 """

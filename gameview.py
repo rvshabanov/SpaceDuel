@@ -21,7 +21,7 @@ class GameView(arcade.View):
     """
     Game View Class
     Init method - parameters:
-                    game_mode   -   Game mode is 0 for 2 player game, 1 for single player
+                    game_mode   -   Game mode is 0 for 2 player game, 1 for single player, 2 - 2 player LAN
     """
     def __init__(self, game_mode):
         super().__init__()
@@ -45,7 +45,7 @@ class GameView(arcade.View):
         self.background = None
 
         # Background music
-        self.music = pm.load(utils.resource_path(os.path.join('data', 'music1.wav')))
+        self.music = pm.load(utils.resource_path(os.path.join('data', 'music1.mp3')))
         self.player = pm.Player()
         self.player.queue(self.music)
         self.player.play()
