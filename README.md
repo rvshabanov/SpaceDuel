@@ -1,5 +1,5 @@
 # SpaceDuel
-## Space Duel game on Python
+### Space Duel game on Python
 
 It's my 2nd ever project on Python. The game uses arcade module. See https://arcade.academy
 
