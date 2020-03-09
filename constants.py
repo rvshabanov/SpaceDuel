@@ -2,10 +2,8 @@
 Main Constants
 Adjust to change game play
 
-TO DO LIST:
-Gameplay:
-TODO: 1. LAN Game (in player get data from socket for P2)
-TODO: 2. MP3 music
+TODO: 1. LAN Game (powerups exchange) <<<<
+
 """
 
 GAME_MODES = ('2 players', '1 player vs AI', '2 players LAN')
@@ -13,8 +11,8 @@ GAME_MODES = ('2 players', '1 player vs AI', '2 players LAN')
 # Window size etc.
 SCREEN_WIDTH = 1600                     # Window width in pixels
 SCREEN_HEIGHT = 800                     # Window height in pixels
-SCREEN_FULLSCREEN = 0                   # Do you want it full screen? Go for it!
-SCREEN_TITLE = "Space Duel v0.0000001"  # Window caption
+SCREEN_FULLSCREEN = 1                   # Do you want it full screen? Go for it!
+SCREEN_TITLE = "Space Duel v2.0"        # Window caption
 SPRITE_SIZE = 64
 
 # Spacecraft related
@@ -51,3 +49,9 @@ PARTICLE_SPEED_FAST = 1.0               # Particle speed
 DEFAULT_SCALE = 0.2                     # Scale of bitmap, 20%
 DEFAULT_ALPHA = 32                      # Alpha
 MAX_EMITTERS = 2                        # Maximum number of burst emitters on the list per player
+
+# LAN game related
+LAN_PORT = 12345                        # Port number used for LAN game
+LISTEN_BACKLOG = 2
+SOCKET_TIMEOUT = 0.01
+MAX_LAN_ERRORS = 5

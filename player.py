@@ -111,9 +111,9 @@ class ClassPlayer:
                     max_speed       - maximum speed ship can fly
                     rotation_speed  - rotation speed per keypress, degrees
                     acceleration    - acceleration per keypress
-                    isAI            - is this ship an AI player? (NPC)
+                    game_mode       - Game mode: 0 - 2P, 1 - 1P vs AI, 2 - LAN Server, 2 - LAN Client
     """
-    def __init__(self, name, ship, x, y, r, max_speed, rotation_speed, acceleration, isai):
+    def __init__(self, name, ship, x, y, r, max_speed, rotation_speed, acceleration, game_mode):
         # Get init params and load to self
         self.name = name
         self.ship = ship
@@ -133,7 +133,10 @@ class ClassPlayer:
         self.sprite_list.append(self.sprite)
 
         # is this player an AI
-        self.isAI = isai
+        if game_mode == 1:
+            self.isAI = game_mode
+        else:
+            self.isAI = 0
 
         # Init emitter used to draw explosions
         self.burst_texture = utils.resource_path(os.path.join('data/' + ship, 'burst.png'))

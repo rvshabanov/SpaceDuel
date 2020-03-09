@@ -2,12 +2,15 @@
 import arcade
 import os
 import pyglet.media as pm
+from _thread import *
+import socket
 
 # My imports
 import constants
 import gameview
 import utils
-
+import server
+from network import Network
 
 """
 Menu View Class
@@ -34,7 +37,7 @@ class MenuView(arcade.View):
         self.menu_item_selected = 0
 
         # Background music
-        self.music = pm.load(utils.resource_path(os.path.join('data', 'music0.mp3')))
+        self.music = pm.load(utils.resource_path(os.path.join('data', 'music0.wav')))
         self.player = pm.Player()
         self.player.queue(self.music)
         self.player.play()
@@ -75,6 +78,8 @@ class MenuView(arcade.View):
     Handles key presses in the main menu
     """
     def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            arcade.close_window()  # Sayonara!
 
         if key == arcade.key.DOWN and self.menu_item_selected < len(self.menu) - 1:
             self.menu_item_selected += 1
@@ -188,7 +193,7 @@ class DifficultyView(arcade.View):
             self.menu_item_selected -= 1
 
         if key == arcade.key.ESCAPE:
-            mainmenu_view = MenuView()  # Show Controls screen
+            mainmenu_view = MenuView()  # Show Main menu screen
             self.window.show_view(mainmenu_view)
 
         if key == arcade.key.ENTER:
@@ -305,6 +310,9 @@ class ServerStartedView(arcade.View):
     def __init__(self):
         super().__init__()
         self.counter = 0
+        start_new_thread(server.start_server, (socket.gethostbyname(socket.gethostname()),))
+        self.n = Network(socket.gethostbyname(socket.gethostname()))
+        self.response = self.n.connect()
 
     def on_show(self):
         arcade.set_background_color(arcade.color.ORANGE)
@@ -313,9 +321,15 @@ class ServerStartedView(arcade.View):
         arcade.start_render()
         arcade.draw_text("Server started", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 150,
                          arcade.color.BLACK, font_size=50, anchor_x="center")
-        arcade.draw_text("Waiting for connection...", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 100,
+        arcade.draw_text("Waiting for connection on", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 100,
                          arcade.color.BLACK, font_size=36, anchor_x="center")
-        arcade.draw_text(str(int(self.counter)), constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 50,
+        arcade.draw_text(socket.gethostbyname(socket.gethostname()) + ":" + str(constants.LAN_PORT),
+                         constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 50,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text("Clients connected: " + str(self.response), constants.SCREEN_WIDTH / 2,
+                         constants.SCREEN_HEIGHT / 2, arcade.color.BLACK, font_size=36, anchor_x="center")
+
+        arcade.draw_text(str(int(self.counter)), constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 - 50,
                          arcade.color.BLACK, font_size=36, anchor_x="center")
 
         arcade.draw_text("Press ESC to go cancel", constants.SCREEN_WIDTH / 2, 0,
@@ -327,6 +341,11 @@ class ServerStartedView(arcade.View):
             self.window.show_view(langame_view)
 
     def on_update(self, delta_time: float):
+        (e, self.response) = self.n.send("POLL")
+        if int(self.response) >= 2:
+            game_view = gameview.GameView(2, self.n)  # 2Ps connected. Start LAN game
+            self.window.show_view(game_view)
+
         self.counter += delta_time
 
 
@@ -334,6 +353,25 @@ class ClientStartedView(arcade.View):
     def __init__(self):
         super().__init__()
         self.counter = 0
+
+        self.lan_a = socket.gethostbyname(socket.gethostname()).split(".")
+        self.lan = self.lan_a[0] + "." + self.lan_a[1] + "." + self.lan_a[2] + "."
+        self.lan_end = 1
+        self.s = None
+        self.n = None
+
+    def try_next_host(self):
+        try:
+            addr = (self.lan + str(self.lan_end), constants.LAN_PORT)
+            self.s = socket.create_connection(addr, constants.SOCKET_TIMEOUT)
+            return True
+        except socket.error as e:
+            # connection timed out
+            print("Socket Error:", e)
+            self.lan_end += 1
+            if self.lan_end > 254:
+                self.lan_end = 1
+            return False
 
     def on_show(self):
         arcade.set_background_color(arcade.color.ORANGE)
@@ -346,6 +384,9 @@ class ClientStartedView(arcade.View):
                          arcade.color.BLACK, font_size=36, anchor_x="center")
         arcade.draw_text(str(int(self.counter)), constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 50,
                          arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text("Trying " + self.lan + str(self.lan_end) + ":" + str(constants.LAN_PORT) + "...",
+                         constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
 
         arcade.draw_text("Press ESC to cancel", constants.SCREEN_WIDTH / 2, 0,
                          arcade.color.BLACK, font_size=20, anchor_x="center")
@@ -356,7 +397,41 @@ class ClientStartedView(arcade.View):
             self.window.show_view(langame_view)
 
     def on_update(self, delta_time: float):
+        # Try subnet
+        if self.try_next_host():
+            self.s.close()
+            self.n = Network(self.lan + str(self.lan_end))
+            game_view = gameview.GameView(3, self.n)  # 2Ps connected. Start LAN game as client
+            self.window.show_view(game_view)
+
         self.counter += delta_time
+
+
+class DisconnectedView(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.ORANGE)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Connection lost", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 150,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Either you or other player", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2 + 100,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text("is disconnected from the server", constants.SCREEN_WIDTH / 2,
+                         constants.SCREEN_HEIGHT / 2 + 50, arcade.color.BLACK, font_size=36, anchor_x="center")
+        arcade.draw_text(":(", constants.SCREEN_WIDTH / 2, constants.SCREEN_HEIGHT / 2,
+                         arcade.color.BLACK, font_size=36, anchor_x="center")
+
+        arcade.draw_text("Press ESC to exit", constants.SCREEN_WIDTH / 2, 0,
+                         arcade.color.BLACK, font_size=20, anchor_x="center")
+
+    def on_key_press(self, key, _modifiers):
+        if key == arcade.key.ESCAPE:
+            mainmenu_view = MenuView()  # Show Main menu screen
+            self.window.show_view(mainmenu_view)
 
 
 """
